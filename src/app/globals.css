@@ -1,0 +1,506 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NOTE: no `scroll-behavior: smooth` here — it conflicts with Lenis
+   smooth scrolling used by the parallax hero (causes jumpy scroll). */
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom scrollbar for a cleaner look */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===== Print styles ===== */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: #fff !important;
+    font-size: 12px;
+  }
+  a[href]::after {
+    content: none !important;
+  }
+  .shadow-card,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+  .print-border {
+    border: 1px solid #d1d5db !important;
+  }
+  main,
+  .print-area {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+  .print-signature {
+    margin-top: 48px;
+    display: flex !important;
+    justify-content: space-between;
+    page-break-inside: avoid;
+  }
+}
+
+/* Signature line used on printable documents */
+.signature-line {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* ============================================================
+   Parallax day/night hero (adapted from the Lovable "Torino" hero)
+   ============================================================ */
+
+:root {
+  --parallax-bg: oklch(12% 0 0);
+  --parallax-fg: oklch(97% 0 0);
+  --parallax-shadow: oklch(0% 0 0 / 0.6);
+}
+
+.parallax {
+  --mode-transition: 10s;
+  background: var(--parallax-bg);
+  color: var(--parallax-fg);
+  transition: background-color var(--mode-transition) ease;
+}
+
+.parallax__header {
+  height: 100svh;
+  min-height: 100vh;
+  position: relative;
+}
+
+.parallax__visuals {
+  height: 120%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.parallax__layers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transition: -webkit-mask-image var(--mode-transition) ease,
+    mask-image var(--mode-transition) ease;
+  mask-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 68%, rgb(0, 0, 0) 100%);
+}
+
+.parallax__layer-img {
+  object-fit: cover;
+  pointer-events: none;
+  width: 100%;
+  height: 117.5%;
+  position: absolute;
+  top: -17.5%;
+  left: 0;
+}
+
+.parallax__layer-title {
+  justify-content: center;
+  align-items: center;
+  height: 100svh;
+  padding-block-end: 16svh;
+  display: flex;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+  padding-inline: 1.5rem;
+}
+
+.parallax__title {
+  letter-spacing: 0;
+  text-align: center;
+  text-shadow: 0 3px 36px var(--parallax-shadow), 0 0 110px var(--parallax-shadow);
+  font-family: Lalezar, Vazirmatn, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(4.5rem, 13vw, 13rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--parallax-fg);
+}
+
+.parallax__fade {
+  background: linear-gradient(to top, var(--parallax-bg), transparent);
+  z-index: 30;
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.parallax__black-line-overflow {
+  background: var(--parallax-bg);
+  z-index: 20;
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+}
+
+.parallax__content {
+  z-index: 2;
+  min-height: 100vh;
+  position: relative;
+  background: var(--parallax-bg);
+  transition: background-color var(--mode-transition) ease;
+  --content-ink: var(--parallax-fg);
+  color: var(--content-ink);
+}
+
+.parallax[data-mode="day"] .parallax__content {
+  --content-ink: oklch(22% 0.02 255);
+}
+
+.parallax[data-mode="night"] {
+  --parallax-bg: oklch(12% 0 0);
+}
+
+.parallax[data-mode="day"] {
+  --parallax-bg: oklch(95.5% 0.012 255);
+  --parallax-shadow: oklch(5% 0.03 260 / 0.75);
+}
+
+.parallax__layer-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.parallax__sky {
+  opacity: 0;
+  transition: opacity var(--mode-transition) ease;
+}
+
+.parallax[data-mode="night"] .parallax__sky[data-sky="night"],
+.parallax[data-mode="day"] .parallax__sky[data-sky="day"] {
+  opacity: 1;
+}
+
+.parallax[data-mode="day"] .parallax__sky[data-sky="day"] {
+  animation: parallax-twinkle 7s ease-in-out infinite;
+}
+
+.parallax__layers > .parallax__layer-img {
+  transition: filter var(--mode-transition) ease;
+}
+
+.parallax[data-mode="day"] .parallax__layers > .parallax__layer-img {
+  filter: sepia(0.4) hue-rotate(180deg) saturate(0.9) brightness(0.42) contrast(1.08);
+}
+
+.parallax[data-mode="day"] .parallax__layers {
+  mask-image: linear-gradient(rgb(0, 0, 0) 0%, rgb(0, 0, 0) 68%, rgba(0, 0, 0, 0) 100%);
+}
+
+.parallax__celestial {
+  opacity: 0;
+  transition: opacity var(--mode-transition) ease,
+    transform var(--mode-transition) cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(-5%) scale(0.96);
+}
+
+.parallax[data-celestial="sun"] [data-body="sun"],
+.parallax[data-celestial="moon"] [data-body="moon"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes parallax-twinkle {
+  50% {
+    filter: brightness(1.14);
+  }
+}
+
+.parallax__mode {
+  z-index: 40;
+  border: 1px solid var(--parallax-fg);
+  top: 1.5rem;
+  border-radius: 999px;
+  gap: 2px;
+  padding: 4px;
+  display: flex;
+  position: absolute;
+  inset-inline-start: 1.5rem;
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .parallax__mode {
+    border: 1px solid color-mix(in oklab, var(--parallax-fg) 22%, transparent);
+    background: color-mix(in oklab, var(--parallax-bg) 55%, transparent);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.parallax__mode button {
+  color: var(--parallax-fg);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  display: inline-flex;
+  cursor: pointer;
+  font-family: Vazirmatn, Lalezar, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.parallax__mode button[data-active="true"] {
+  background: var(--parallax-fg);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .parallax__mode button {
+    color: color-mix(in oklab, var(--parallax-fg) 65%, transparent);
+  }
+  .parallax__mode button[data-active="true"] {
+    background: color-mix(in oklab, var(--parallax-fg) 16%, transparent);
+    color: var(--parallax-fg);
+  }
+}
+
+.parallax__mode button:focus-visible {
+  outline: 2px solid var(--parallax-fg);
+  outline-offset: 2px;
+}
+
+/* Scene-aware content helpers (day/night adaptive) */
+.scene-fg {
+  color: var(--content-ink, var(--parallax-fg));
+  transition: color var(--mode-transition) ease;
+}
+
+.scene-muted {
+  color: color-mix(in oklab, var(--content-ink, var(--parallax-fg)) 65%, transparent);
+  transition: color var(--mode-transition) ease;
+}
+
+.scene-panel {
+  background: color-mix(in oklab, var(--content-ink, var(--parallax-fg)) 8%, transparent);
+  transition: background-color var(--mode-transition) ease;
+}
+
+.parallax__content h1,
+.parallax__content h2,
+.parallax__content h3 {
+  transition: color var(--mode-transition) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax__celestial {
+    transition: opacity var(--mode-transition) ease;
+    transform: none !important;
+  }
+  .parallax[data-mode="day"] .parallax__sky[data-sky="day"] {
+    animation: none;
+  }
+}
+
+@media print {
+  .parallax__header {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   Night mode — utility overrides scoped under html.dark
+   (keeps every page consistent in both day and night mode)
+   ============================================================ */
+.dark body {
+  background-color: #0b1220;
+  color: #e2e8f0;
+}
+.dark .bg-white {
+  background-color: #0f172a;
+}
+.dark .bg-white\/90,
+.dark .bg-white\/95 {
+  background-color: rgb(15 23 42 / 0.92);
+}
+.dark .bg-slate-50 {
+  background-color: #0b1220;
+}
+.dark .bg-slate-100 {
+  background-color: #1e293b;
+}
+.dark .bg-slate-200 {
+  background-color: #334155;
+}
+.dark .text-slate-900,
+.dark .text-slate-800 {
+  color: #e2e8f0;
+}
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+.dark .text-slate-500,
+.dark .text-slate-400 {
+  color: #94a3b8;
+}
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/80 {
+  border-color: #1e293b;
+}
+.dark .border-slate-300,
+.dark .border-slate-300\/70 {
+  border-color: #334155;
+}
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b;
+}
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover {
+  background-color: #1e293b;
+}
+.dark .hover\:text-slate-900:hover {
+  color: #f1f5f9;
+}
+.dark .shadow-card {
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+}
+.dark .shadow-xl {
+  box-shadow: 0 20px 45px rgb(0 0 0 / 0.45);
+}
+.dark input,
+.dark select,
+.dark textarea {
+  color-scheme: dark;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b;
+}
+/* brand-tinted surfaces */
+.dark .bg-brand-50 {
+  background-color: rgb(17 130 88 / 0.16);
+}
+.dark .bg-brand-100 {
+  background-color: rgb(17 130 88 / 0.28);
+}
+.dark .border-brand-200 {
+  border-color: rgb(65 189 137 / 0.35);
+}
+.dark .text-brand-700,
+.dark .text-brand-800,
+.dark .text-brand-900 {
+  color: #79d8ac;
+}
+.dark .hover\:bg-brand-50:hover {
+  background-color: rgb(17 130 88 / 0.28);
+}
+.dark .hover\:bg-brand-100:hover {
+  background-color: rgb(17 130 88 / 0.4);
+}
+/* soft tone surfaces (alerts, badges) */
+.dark .bg-red-50 {
+  background-color: rgb(127 29 29 / 0.28);
+}
+.dark .bg-amber-50 {
+  background-color: rgb(120 53 15 / 0.32);
+}
+.dark .bg-green-50,
+.dark .bg-emerald-50 {
+  background-color: rgb(6 78 59 / 0.32);
+}
+.dark .bg-blue-50,
+.dark .bg-sky-50 {
+  background-color: rgb(30 58 138 / 0.32);
+}
+.dark .text-red-700 {
+  color: #fca5a5;
+}
+.dark .text-amber-700 {
+  color: #fcd34d;
+}
+.dark .text-green-700,
+.dark .text-emerald-700 {
+  color: #86efac;
+}
+.dark .text-blue-700,
+.dark .text-sky-700 {
+  color: #93c5fd;
+}
+.dark .hover\:bg-red-50:hover {
+  background-color: rgb(127 29 29 / 0.4);
+}
+.dark .hover\:bg-sky-50:hover {
+  background-color: rgb(30 58 138 / 0.45);
+}
+.dark .hover\:bg-emerald-50:hover {
+  background-color: rgb(6 78 59 / 0.45);
+}
+/* dashed empty-state borders */
+.dark .border-dashed {
+  border-color: #334155;
+}
+/* ring/hover borders on cards */
+.dark .hover\:border-brand-400:hover {
+  border-color: #41bd89;
+}
+.dark .hover\:border-slate-300:hover {
+  border-color: #475569;
+}
+
+/* print always looks like light mode */
+@media print {
+  .dark body,
+  body {
+    background: white !important;
+    color: #0f172a !important;
+  }
+  .dark .bg-white,
+  .dark .bg-slate-50,
+  .dark .bg-slate-100,
+  .dark .bg-slate-200 {
+    background-color: white !important;
+  }
+  .dark .text-slate-900,
+  .dark .text-slate-800,
+  .dark .text-slate-700,
+  .dark .text-slate-600,
+  .dark .text-slate-500 {
+    color: #0f172a !important;
+  }
+  .dark .border-slate-100,
+  .dark .border-slate-200,
+  .dark .border-slate-300 {
+    border-color: #e2e8f0 !important;
+  }
+}

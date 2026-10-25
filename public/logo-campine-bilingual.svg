@@ -1,0 +1,55 @@
+<svg viewBox="0 0 260 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="کمپینه Campine - نماد کمپ">
+  <!-- Icon - Camping symbol -->
+  <g transform="translate(8,4)">
+    <!-- Circle base -->
+    <circle cx="28" cy="28" r="28" fill="#17382f"/>
+    <circle cx="28" cy="28" r="28" fill="none" stroke="white" stroke-opacity="0.08" stroke-width="1.5"/>
+    
+    <!-- Pine trees behind tent - minimalist -->
+    <g opacity="0.95">
+      <!-- Left pine -->
+      <path d="M14 36 L18 20 L22 36 Z" fill="white" fill-opacity="0.92"/>
+      <path d="M14 32 L18 18 L22 32 Z" fill="white" fill-opacity="0.88"/>
+      <path d="M15.5 40 L18 26 L20.5 40 Z" fill="white"/>
+      <!-- Right pine -->
+      <path d="M34 36 L38 20 L42 36 Z" fill="white" fill-opacity="0.92"/>
+      <path d="M34 32 L38 18 L42 32 Z" fill="white" fill-opacity="0.88"/>
+      <path d="M35.5 40 L38 26 L40.5 40 Z" fill="white"/>
+    </g>
+    
+    <!-- Tent - central camping symbol -->
+    <path d="M28 18 L10 42 H46 Z" fill="white"/>
+    <path d="M28 18 L16 42 H40 Z" fill="#f7f4ed"/>
+    <!-- Tent entrance - terracotta -->
+    <path d="M28 18 L19 42 H37 Z" fill="#d96d43"/>
+    <path d="M28 18 L22 42 H34 Z" fill="#e88b64"/>
+    <!-- Tent pole -->
+    <path d="M28 18 V42" stroke="#17382f" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- Tent side lines -->
+    <path d="M10 42 L28 18 L46 42" fill="none" stroke="#17382f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.15"/>
+    
+    <!-- Campfire in front - small -->
+    <g transform="translate(28,46)">
+      <path d="M-4 6 L0 -4 L4 6 Z" fill="#d96d43"/>
+      <path d="M-2.5 6 L0 0 L2.5 6 Z" fill="#f7a072"/>
+      <path d="M-5 6 Q-3 3 0 2 Q3 3 5 6" fill="white" opacity="0.9"/>
+    </g>
+    
+    <!-- Stars above -->
+    <g fill="white">
+      <circle cx="46" cy="12" r="1.1" opacity="0.95"/>
+      <circle cx="10" cy="14" r="0.9" opacity="0.75"/>
+      <circle cx="50" cy="18" r="0.7" opacity="0.6"/>
+    </g>
+  </g>
+  
+  <!-- Text - Bilingual combined -->
+  <g transform="translate(76,0)">
+    <!-- Persian - کمپینه - main -->
+    <text x="0" y="28" font-family="Vazirmatn, Tahoma, 'IranSans', sans-serif" font-size="28" font-weight="900" fill="#17382f" letter-spacing="-0.02em">کمپینه</text>
+    <!-- English - CAMPINE - sub -->
+    <text x="1" y="44" font-family="Inter, system-ui, sans-serif" font-size="13.5" font-weight="800" fill="#d96d43" letter-spacing="0.32em">CAMPINE</text>
+    <!-- Tagline - subtle -->
+    <text x="1" y="56" font-family="Inter, Vazirmatn, Tahoma, sans-serif" font-size="8.5" font-weight="600" fill="#64748b" letter-spacing="0.08em">تور با لیدرِ محبوبت • TOUR WITH FAVORITE LEADER</text>
+  </g>
+</svg>

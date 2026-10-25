@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String?  @unique
+  passwordHash String?
+  role         String   @default("passenger") // passenger | leader | admin
+  phone        String?  @unique
+  bio          String?
+  bioEn        String?
+  avatarUrl    String?
+  idCardUrl    String?
+  isSuspended  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  trips              Trip[]             @relation("LeaderTrips")
+  bookings           Booking[]
+  cooperationRequest CooperationRequest?
+  leaderReviews      LeaderReview[]     @relation("LeaderReviews")
+  passengerReviews   LeaderReview[]     @relation("PassengerReviews")
+}
+
+model Trip {
+  id            Int       @id @default(autoincrement())
+  code          String    @unique
+  title         String
+  titleEn       String?
+  destination   String
+  destinationEn String?
+  description   String    @default("")
+  descriptionEn String    @default("")
+  includes      String    @default("")
+  includesEn    String    @default("")
+  excludes      String    @default("")
+  excludesEn    String    @default("")
+  startDate     DateTime
+  endDate       DateTime
+  startDateJalali String? // Jalali ISO YYYY-MM-DD for full bilingual search/storage
+  endDateJalali   String?
+  price         Int
+  capacity      Int
+  imageUrl      String?
+  // draft -> pending -> approved -> published -> completed
+  //        \-> rejected (can edit & resubmit)     \-> cancelled
+  status        String    @default("draft")
+  adminNote     String?
+  leaderBanned  Boolean   @default(false)
+  leaderId      Int
+  leader        User      @relation("LeaderTrips", fields: [leaderId], references: [id])
+  bookings      Booking[]
+  reviews       LeaderReview[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Booking {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  seats       Int       @default(1)
+  note        String?
+  leaderNote  String?
+  // pending -> approved -> paid -> completed
+  //        \-> rejected | cancelled
+  status      String    @default("pending")
+  tripId      Int
+  trip        Trip      @relation(fields: [tripId], references: [id])
+  passengerId Int
+  passenger   User      @relation(fields: [passengerId], references: [id])
+  payment     Payment?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Payment {
+  id        Int       @id @default(autoincrement())
+  bookingId Int       @unique
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+  amount    Int
+  authority String?
+  refId     String?
+  status    String    @default("initiated") // initiated | paid | failed
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model SmsCode {
+  id        Int       @id @default(autoincrement())
+  phone     String
+  code      String
+  purpose   String // login | register
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([phone, purpose])
+}
+
+model CooperationRequest {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String?
+  city      String?
+  message   String
+  idCardUrl String?
+  licenseUrls String  @default("[]") // JSON array of uploaded license/certificate file URLs
+  status    String    @default("pending") // pending | approved | rejected
+  adminNote String?
+  createdAt DateTime  @default(now())
+
+  userId Int?   @unique
+  user   User?   @relation(fields: [userId], references: [id])
+}
+
+model LeaderReview {
+  id          Int      @id @default(autoincrement())
+  rating      Int // 1..5
+  comment     String?
+  tripId      Int
+  trip        Trip     @relation(fields: [tripId], references: [id])
+  leaderId    Int
+  leader      User     @relation("LeaderReviews", fields: [leaderId], references: [id])
+  passengerId Int
+  passenger   User     @relation("PassengerReviews", fields: [passengerId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([tripId, passengerId])
+}
